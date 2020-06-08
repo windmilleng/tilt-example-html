@@ -1,0 +1,24 @@
+# Workaround for:
+# https://github.com/tilt-dev/tilt/issues/3421
+local('kubectl create namespace knative-serving || true')
+local('istioctl install --set profile=demo')
+local('kubectl apply -f https://github.com/knative/serving/releases/download/v0.15.0/serving-crds.yaml')
+local('kubectl apply -f https://github.com/knative/serving/releases/download/v0.15.0/serving-core.yaml')
+local('kubectl apply -f https://github.com/knative/net-istio/releases/download/v0.15.0/release.yaml')
+
+k8s_yaml('config.yaml')
+k8s_yaml('kubernetes.yaml')
+k8s_kind('Service', api_version='serving.knative.dev/v1',
+         image_json_path='{.spec.template.spec.containers[].image}')
+k8s_resource('example-html', port_forwards=8000, resource_deps=['deploy'],
+             extra_pod_selectors=[{'app': 'example-html'}])
+
+# Records the time from a code change to a new process.
+# Normally, you would let Tilt do deploys automatically, but this
+# shows you how to set up a custom workflow that measures it.
+local_resource(
+  'deploy',
+  'python now.py > start-time.txt')
+
+# Add a live_update rule to our docker_build.
+docker_build('example-html-image', '.')

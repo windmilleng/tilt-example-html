@@ -9,7 +9,7 @@ local_resource(
   'python now.py > start-time.txt')
 
 # Add a live_update rule to our docker_build.
-docker_build('example-html-image', '.', live_update=[
+docker_build('example-html-image', '.', ignore=['other-file.txt'], live_update=[
   sync('.', '/app'),
   run('./report-deployment-time.sh'),
   run('sed -i "s/Hello cats/Congratulations, you set up live_update/g" index.html'),

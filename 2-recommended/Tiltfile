@@ -1,5 +1,13 @@
+load('ext://namespace', 'namespace_create')
+
+namespace_create('example-html')
+k8s_resource(
+    objects=['example-html:namespace'],
+    new_name='namespace'
+)
+
 k8s_yaml('kubernetes.yaml')
-k8s_resource('example-html', port_forwards=8000, resource_deps=['deploy'])
+k8s_resource('example-html', port_forwards=8000, resource_deps=['deploy', 'namespace'])
 
 # Records the time from a code change to a new process.
 # Normally, you would let Tilt do deploys automatically, but this

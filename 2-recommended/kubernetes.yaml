@@ -13,6 +13,10 @@ spec:
       labels:
         app: example-html
     spec:
+      initContainers:
+      - name: pending
+        image: busybox
+        command: ["sleep", "10"]
       containers:
       - name: example-html
         image: example-html-image

@@ -1,0 +1,87 @@
+
+obj = [0]
+def cmd():
+  obj[0] = obj[0] + 1
+  return 'sleep 3 && echo %d' % obj[0]
+
+docker_build('image-9907', '.', dockerfile_contents="""
+FROM busybox
+RUN %s
+""" % cmd())
+docker_build('image-027b', '.', dockerfile_contents="""
+FROM image-9907
+RUN %s
+""" % cmd())
+docker_build('image-be1c', '.', dockerfile_contents="""
+FROM image-9907
+RUN %s
+""" % cmd())
+docker_build('image-0f18', '.', dockerfile_contents="""
+FROM image-be1c
+RUN %s
+""" % cmd())
+docker_build('image-76a2', '.', dockerfile_contents="""
+FROM image-0f18
+RUN %s
+""" % cmd())
+docker_build('image-3bb3', '.', dockerfile_contents="""
+FROM image-0f18
+RUN %s
+""" % cmd())
+docker_build('image-9d7d', '.', dockerfile_contents="""
+FROM image-0f18
+RUN %s
+""" % cmd())
+docker_build('image-acac', '.', dockerfile_contents="""
+FROM image-0f18
+RUN %s
+""" % cmd())
+docker_build('image-489e', '.', dockerfile_contents="""
+FROM image-0f18
+RUN %s
+""" % cmd())
+docker_build('image-89fa', '.', dockerfile_contents="""
+FROM image-0f18
+RUN %s
+""" % cmd())
+docker_build('image-79bf', '.', dockerfile_contents="""
+FROM image-9d7d
+RUN %s
+""" % cmd())
+docker_build('image-f9a5', '.', dockerfile_contents="""
+FROM image-9d7d
+RUN %s
+""" % cmd())
+docker_build('image-4496', '.', dockerfile_contents="""
+FROM image-9d7d
+RUN %s
+""" % cmd())
+docker_build('image-d717', '.', dockerfile_contents="""
+FROM image-9d7d
+RUN %s
+""" % cmd())
+
+images = [
+  'image-027b',
+  'image-76a2',
+  'image-3bb3',
+  'image-79bf',
+  'image-f9a5',
+  'image-4496',
+  'image-d717',
+  'image-489e',
+  'image-89fa',
+  'image-acac',
+]
+
+k8s_yaml('crd.yaml')
+k8s_kind('UselessMachine', image_json_path='{.spec.image}', pod_readiness='ignore')
+for i in images:
+  k8s_yaml(blob("""
+apiVersion: tilt.dev/v1alpha1
+kind: UselessMachine
+metadata:
+  name: %s
+spec:
+  image: %s
+""" % (i, i)))

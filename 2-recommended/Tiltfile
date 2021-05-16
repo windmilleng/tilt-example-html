@@ -11,6 +11,7 @@ local_resource(
 # Add a live_update rule to our docker_build.
 docker_build('example-html-image', '.', live_update=[
   sync('.', '/app'),
+  run('echo match-trigger!', trigger='./triggers/'),
   run('./report-deployment-time.sh'),
   run('sed -i "s/Hello cats/Congratulations, you set up live_update/g" index.html'),
 ])

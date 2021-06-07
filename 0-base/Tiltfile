@@ -1,3 +1,8 @@
 docker_build('example-html-image', '.')
 k8s_yaml('kubernetes.yaml')
 k8s_resource('example-html', port_forwards=8000)
+
+local_resource(
+  name='example-html-ready',
+  cmd='echo "example-html is ready"',
+  resource_deps=['example-html'])

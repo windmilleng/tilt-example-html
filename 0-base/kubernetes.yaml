@@ -18,3 +18,7 @@ spec:
         image: example-html-image
         ports:
         - containerPort: 8000
+        readinessProbe:
+          httpGet:
+            port: 8000
+
